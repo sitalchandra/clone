@@ -1,0 +1,87 @@
+The problem of solving the mode- subproblem in an unaligned kernelized CP decomposition is computationally daunting due to the  system size and the sparse selection matrix . To solve this efficiently without order  or  costs, we leverage the structure of the **Khatri-Rao product** and the sparsity of the observed entries.
+
+---
+
+### 1. The Method: Preconditioned Conjugate Gradient (PCG)
+
+Since the system matrix  is positive semi-definite (and typically positive definite with the regularization ), PCG is the ideal iterative solver.
+
+The efficiency of PCG relies on two factors:
+
+1. **Fast Matrix-Vector Products (MVPs):** Computing  without explicitly forming .
+2. **Effective Preconditioning:** Finding a matrix  such that , where  is cheap to compute.
+
+### 2. Computing Matrix-Vector Products Efficiently
+
+The core challenge is the term . Let . We break the product into stages to avoid forming  or  matrices.
+
+#### A. The Right Side: 
+
+By the properties of Kronecker products, .
+
+* However,  is an  matrix. We do **not** form this matrix.
+* Instead, since  only selects  entries, we only compute the values of  for the  indices  where data is observed.
+* **Cost:** Computing  entries of this product costs .
+
+#### B. The Middle: 
+
+ is a diagonal matrix acting as a mask. This step simply keeps the  computed values and sets everything else to zero.
+
+#### C. The Left Side: 
+
+Let  be the vector of  selected values. Applying  is equivalent to a "scatter-gather" operation.
+
+* Mathematically,  can be computed by iterating over the  observed entries. For each entry  with value , we update the result matrix using the -th column of  and -th row of .
+* **Cost:** .
+
+#### D. The Regularization: 
+
+This is simply .
+
+* **Cost:** .
+
+**Total MVP Cost:** . Since , this is significantly more efficient than standard methods.
+
+---
+
+### 3. Choice of Preconditioner
+
+A highly effective preconditioner for kernelized systems is the **Block-Jacobi preconditioner** or the **Regularized Kronecker preconditioner**.
+
+Given the structure, we use:
+
+
+
+Since  is typically  and  is small, we can pre-factor  (or the block diagonal part). Applying  involves solving  independent linear systems of size , which costs  initially (for Cholesky) and  per iteration.
+
+This preconditioner accounts for the RKHS smoothness  and the regularization, which are often the primary drivers of the system's condition number.
+
+---
+
+### 4. Why This Works (Avoidance of )
+
+The selection matrix  is the key. While the full unfolding  is  (where  is huge), we only care about the **sampling pattern**.
+
+1. **MTTKRP ():** The vector  on the right-hand side is computed using sparse MTTKRP algorithms, which only iterate over the  non-zero entries of the tensor.
+2. **Implicit Sparsity:** We never form  (size ). We only interact with its "rows" corresponding to the  observed entries.
+
+---
+
+### 5. Complexity Analysis
+
+The complexity is dominated by the MVPs within the PCG iterations. Let  be the number of iterations to converge.
+
+| Operation | Complexity |
+| --- | --- |
+| **Sparse MTTKRP ()** |  |
+| **Preconditioner Factoring** |  |
+| **MVP (Sparse part)** |  |
+| **MVP (Kernel/Reg part)** |  |
+| **Preconditioner Solve** |  |
+| **Total (per iteration)** |  |
+
+**Overall Complexity:** .
+
+Compared to  for a direct solver or  for dense methods, this approach is feasible for large-scale "unaligned" data because it scales linearly with the number of observed entries  and polynomially with the small mode-dimension .
+
+**Would you like me to provide the specific pseudocode for the sparse MVP ?**

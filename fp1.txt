@@ -1,0 +1,37 @@
+In short: **No, the measures  and $T_{\psi*}\mu$ are mutually singular.**
+
+This is a classic result in constructive quantum field theory and the analysis of singular stochastic PDEs. While for a Gaussian measure (like the Free Field), equivalence is governed by the Cameron-Martin theorem, the  measure is "too singular" for a smooth shift to preserve absolute continuity.
+
+---
+
+### 1. The Gaussian Case (The Baseline)
+
+To understand why they are not equivalent for , it helps to look at the Gaussian Free Field (GFF) on , denoted by .
+
+* The GFF on  has a covariance operator .
+* According to the **Cameron-Martin Theorem**, the shifted measure  is equivalent to  if and only if  is in the Cameron-Martin space .
+* Since you specified  is a smooth, non-zero function, it is certainly in . Thus, for the **Free Field**, the measures would be equivalent.
+
+### 2. The  Problem: Singularity
+
+The  measure is formally defined as:
+
+
+However, in three dimensions, this definition is strictly formal. Elements  in the support of  are distributions with regularity . When you try to define the  term, you encounter ultraviolet divergences that require **renormalization** (specifically, using Wick polynomials and infinite counterterms).
+
+The non-equivalence stems from the following factors:
+
+* **Disjoint Support:** In , the non-linear interaction is so strong that the measure  becomes singular with respect to the underlying Gaussian measure .
+* **Renormalization Dependance:** The renormalization constants required to define the  measure depend on the local behavior of the field. A shift by a smooth function  shifts the field values but does not "shift" the renormalization counterterms in a way that preserves the measure's structure.
+* **Feldman-Shay Theorem Analogy:** Just as Gaussian measures with different covariances are usually singular in infinite dimensions, the "perturbed" measure  "sees" a different potential that the singular fluctuations of the  field cannot accommodate.
+
+### 3. Rigorous Context
+
+In the language of modern Regularity Structures or Paracontrolled Distributions (the frameworks used by Hairer and Gubinelli to build this measure), the  measure is supported on a "model space." Shifting the distribution by a smooth function  changes the "renormalized constants" effectively seen by the field.
+
+Because the field  is so singular, any shift  moves the measure to a set of distributions that the original measure  assigns zero probability to. Therefore:
+
+
+---
+
+**Would you like me to explain how the Cameron-Martin space is defined for the Gaussian Free Field, or perhaps dive into how renormalization constants cause this singularity in ?**
